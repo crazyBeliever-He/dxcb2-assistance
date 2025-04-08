@@ -1,6 +1,8 @@
+from PyQt5.QtCore import QCoreApplication
 from PyQt5.QtWidgets import QMainWindow, QVBoxLayout, QWidget, QPushButton, QLineEdit, QLabel
-from PyQt5.QtCore import pyqtSignal
+
 from core.thread_manager import ThreadManager
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -60,3 +62,10 @@ class MainWindow(QMainWindow):
     def stop_capture(self):
         self.thread_manager.stop_capture()
         self.status_label.setText("Status: Stopped")
+
+    def closeEvent(self, event):  # 新增方法
+        # 停止所有捕获线程
+        self.thread_manager.stop_capture()
+        # 确保完全退出应用程序
+        QCoreApplication.quit()
+        event.accept()
