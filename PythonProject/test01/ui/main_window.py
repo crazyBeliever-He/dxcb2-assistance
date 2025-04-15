@@ -36,9 +36,9 @@ class MainWindow(QMainWindow):
         # layout.addWidget(self.pause_button)
 
         # 结束按钮
-        self.stop_button = QPushButton("Stop", self)
-        self.stop_button.clicked.connect(self.stop_capture)
-        layout.addWidget(self.stop_button)
+        # self.stop_button = QPushButton("Stop", self)
+        # self.stop_button.clicked.connect(self.stop_capture)
+        # layout.addWidget(self.stop_button)
 
         # 状态标签
         self.status_label = QLabel("Status: Idle", self)
@@ -59,9 +59,9 @@ class MainWindow(QMainWindow):
     #     self.thread_manager.pause_capture()
     #     self.status_label.setText("Status: Paused")
 
-    def stop_capture(self):
-        self.thread_manager.stop_capture()
-        self.status_label.setText("Status: Stopped")
+    # def stop_capture(self):
+    #     self.thread_manager.stop_capture()
+    #     self.status_label.setText("Status: Stopped")
 
     def closeEvent(self, event):  # 新增方法
         # 停止所有捕获线程

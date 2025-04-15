@@ -1,5 +1,7 @@
 import os
 
+import cv2
+import numpy as np
 import win32con
 import win32gui
 import win32ui
@@ -57,3 +59,6 @@ def capture_window(window_title):
     win32gui.ReleaseDC(hwnd, hwnd_dc)
 
     return image
+
+
+

@@ -14,9 +14,9 @@ class ThreadManager:
         self.capture_thread = threading.Thread(target=self.process_capture.run)
         self.capture_thread.start()
 
-    def pause_capture(self):
-        if self.process_capture:
-            self.process_capture.pause()
+    # def pause_capture(self):
+    #     if self.process_capture:
+    #         self.process_capture.pause()
 
     def stop_capture(self):
         if self.process_capture:
