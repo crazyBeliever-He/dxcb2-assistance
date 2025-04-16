@@ -7,6 +7,10 @@ from core.thread_manager import ThreadManager
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+        self.status_label = None
+        self.stop_button = None
+        self.start_button = None
+        self.process_name_input = None
         self.setWindowTitle("Process Image Capture")
         self.setGeometry(100, 100, 400, 300)
 

@@ -1,41 +1,55 @@
-import time
 import threading
+import time
 
-import cv2
-from PIL import ImageGrab
-from .image_analysis import analyze_image
 from utils.file_utils import capture_window
+from .image_analysis import analyze_image, release_ocr
+
 
 class ProcessCapture:
     def __init__(self, process_name):
         self.process_name = process_name
-        self.is_running = False
+        self.is_running = True
         self.is_paused = False
         self.lock = threading.Lock()
+        self.ocr_lock = threading.Lock()  # OCR专用锁
 
     def run(self):
-        self.is_running = True
-        while self.is_running:
-            with self.lock:
-                if not self.is_paused:
-                    # 捕获图像并处理
-                    screenshot = capture_window(self.process_name)
-                    self.process_image(screenshot)
-            time.sleep(1)
+        try:
+            while self.is_running:
+                with self.lock:
+                    if not self.is_paused:
+                        # 截图并处理
+                        screenshot = capture_window(self.process_name)
+                        if screenshot:
+                            self.process_image(screenshot)
+                time.sleep(1)
+        except Exception as e:
+            print(f"捕获线程异常: {e}")
+        finally:
+            try:
+                from .image_analysis import release_ocr
+                release_ocr()
+            except Exception as e:
+                print(f"释放资源时出错: {e}")
 
     def process_image(self, image):
-        # 这里可以添加图像分析逻辑
-        if image:
-            analyze_image(image)
-            print(f"Processing image for process: {self.process_name}")
+        """
+        处理截图并进行OCR分析.核心函数
+        :param image: 截图图像
+        :return: None
+        """
+        with self.ocr_lock:  # 加锁保护OCR调用
+            if image:
+                analyze_image(image)
+                print(f"Processing image for process: {self.process_name}")
 
-    def pause(self):
-        with self.lock:
-            self.is_paused = True
-
-    def resume(self):
-        with self.lock:
-            self.is_paused = False
+    # def pause(self):
+    #     with self.lock:
+    #         self.is_paused = True
+    #
+    # def resume(self):
+    #     with self.lock:
+    #         self.is_paused = False
 
     def stop(self):
         self.is_running = False

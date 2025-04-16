@@ -20,10 +20,13 @@ class ThreadManager:
 
     def stop_capture(self):
         if self.process_capture:
-            self.process_capture.stop()  # 设置停止标志
-            if self.capture_thread and self.capture_thread.is_alive():
-                self.capture_thread.join(timeout=2.0)  # 延长超时时间
+            self.process_capture.stop()
+            if self.capture_thread:
+                self.capture_thread.join(timeout=2.0)
                 if self.capture_thread.is_alive():
-                    print("警告：线程未正常停止，强制终止")
+                    print("警告：线程未正常停止，尝试强制清理")
+                    # 强制释放资源
+                    from core.image_analysis import release_ocr
+                    release_ocr()
                     self.capture_thread = None
-        self.process_capture = None
+            self.process_capture = None

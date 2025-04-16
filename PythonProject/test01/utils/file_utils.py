@@ -1,7 +1,3 @@
-import os
-
-import cv2
-import numpy as np
 import win32con
 import win32gui
 import win32ui
@@ -13,7 +9,11 @@ def save_image(image, file_path):
     print(f"Image saved to {file_path}")
 
 def capture_window(window_title):
-    # 查找窗口句柄
+    """
+    捕获指定窗口的图像并返回 PIL 图像对象
+    :param window_title: 窗口标题
+    :return:   PIL 图像对象
+    """
     hwnd = win32gui.FindWindow(None, window_title)
     if not hwnd:
 
