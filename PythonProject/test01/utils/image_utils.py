@@ -4,9 +4,22 @@ import win32ui
 from PIL import Image
 
 def save_image(image, file_path):
-    """保存图像到文件"""
+    """保存图像"""
     image.save(file_path)
     print(f"Image saved to {file_path}")
+
+def cut_image(image, left, top, right, bottom):
+    """
+    裁剪图像
+    :param image: PIL 图像对象
+    :param left: 裁剪区域左边界
+    :param top: 裁剪区域上边界
+    :param right: 裁剪区域右边界
+    :param bottom: 裁剪区域下边界
+    :return: 裁剪后的图像
+    """
+
+    return image.crop((left, top, right, bottom))
 
 def capture_window(window_title):
     """

@@ -1,8 +1,9 @@
 import threading
 import time
 
-from utils.file_utils import capture_window
-from .image_analysis import analyze_image, release_ocr
+from utils.image_utils import capture_window
+from utils.orc_utils import release_ocr
+from .image_analysis import analyze_image
 
 
 class ProcessCapture:
@@ -27,14 +28,13 @@ class ProcessCapture:
             print(f"捕获线程异常: {e}")
         finally:
             try:
-                from .image_analysis import release_ocr
                 release_ocr()
             except Exception as e:
                 print(f"释放资源时出错: {e}")
 
     def process_image(self, image):
         """
-        处理截图并进行OCR分析.核心函数
+        处理截图并进行OCR分析.核心功能函数
         :param image: 截图图像
         :return: None
         """
@@ -42,14 +42,6 @@ class ProcessCapture:
             if image:
                 analyze_image(image)
                 print(f"Processing image for process: {self.process_name}")
-
-    # def pause(self):
-    #     with self.lock:
-    #         self.is_paused = True
-    #
-    # def resume(self):
-    #     with self.lock:
-    #         self.is_paused = False
 
     def stop(self):
         self.is_running = False

@@ -1,45 +1,7 @@
-import os
-import threading
-
 import numpy as np
-from paddleocr import PaddleOCR
 
-from utils.file_utils import save_image
-
-model_dir = "./models"
-os.makedirs(model_dir, exist_ok=True)
-
-# 全局OCR实例和锁
-_ocr = None
-_ocr_init_lock = threading.Lock()
-
-def init_ocr():
-    global _ocr
-    with _ocr_init_lock:
-        if _ocr is None:
-            _ocr = PaddleOCR(
-                use_gpu=False,
-                det_model_dir=os.path.join(model_dir, "ch_PP-OCRv4_det_infer"),
-                rec_model_dir=os.path.join(model_dir, "ch_PP-OCRv4_rec_infer"),
-                lang='ch'
-            )
-    return _ocr
-
-def release_ocr():
-    global _ocr
-    if _ocr is not None:
-        # PaddlePaddle的清理方式
-        try:
-            # 释放检测器资源
-            if hasattr(_ocr, 'text_detector') and hasattr(_ocr.text_detector, 'predictor'):
-                del _ocr.text_detector.predictor
-            # 释放识别器资源
-            if hasattr(_ocr, 'text_recognizer') and hasattr(_ocr.text_recognizer, 'predictor'):
-                del _ocr.text_recognizer.predictor
-        except Exception as e:
-            print(f"释放OCR资源时出错: {e}")
-        finally:
-            _ocr = None
+from utils.image_utils import save_image
+from utils.orc_utils import init_ocr
 
 
 def analyze_image(image):

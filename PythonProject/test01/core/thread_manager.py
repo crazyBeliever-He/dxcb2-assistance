@@ -14,10 +14,6 @@ class ThreadManager:
         self.capture_thread = threading.Thread(target=self.process_capture.run)
         self.capture_thread.start()
 
-    # def pause_capture(self):
-    #     if self.process_capture:
-    #         self.process_capture.pause()
-
     def stop_capture(self):
         if self.process_capture:
             self.process_capture.stop()
@@ -26,7 +22,7 @@ class ThreadManager:
                 if self.capture_thread.is_alive():
                     print("警告：线程未正常停止，尝试强制清理")
                     # 强制释放资源
-                    from core.image_analysis import release_ocr
+                    from utils.image_utils import release_ocr
                     release_ocr()
                     self.capture_thread = None
             self.process_capture = None
