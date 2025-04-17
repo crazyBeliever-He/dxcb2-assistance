@@ -33,6 +33,7 @@ def analyze_image_bar(image, screen_coordinate):
     index, text, bbox = find_text_index(result[0], "酒馆")
     if index is not None:
         # 在屏幕坐标上添加随机偏移量
+        # 后面改用别的不影响用户使用鼠标的包
         random_x = advanced_random_generator(bbox[0], bbox[2], mode="float")
         random_y = advanced_random_generator(bbox[1], bbox[3], mode="float")
         pyautogui.moveTo(screen_coordinate[0] + random_x + 5 , screen_coordinate[1] + random_y + 5, duration=1)
