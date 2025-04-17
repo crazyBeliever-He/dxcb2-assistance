@@ -3,8 +3,7 @@ import time
 
 from utils.image_utils import capture_window
 from utils.orc_utils import release_ocr
-from .image_analysis import analyze_image
-
+from .image_analysis import analyze_image_42botty, analyze_image_bar
 
 class ProcessCapture:
     def __init__(self, process_name):
@@ -20,9 +19,9 @@ class ProcessCapture:
                 with self.lock:
                     if not self.is_paused:
                         # 截图并处理
-                        screenshot = capture_window(self.process_name)
+                        screenshot,screen_coordinate = capture_window(self.process_name)
                         if screenshot:
-                            self.process_image(screenshot)
+                            self.process_image(screenshot, screen_coordinate)
                 time.sleep(1)
         except Exception as e:
             print(f"捕获线程异常: {e}")
@@ -32,15 +31,16 @@ class ProcessCapture:
             except Exception as e:
                 print(f"释放资源时出错: {e}")
 
-    def process_image(self, image):
+    def process_image(self, image, screen_coordinate):
         """
         处理截图并进行OCR分析.核心功能函数
+        :param screen_coordinate: 屏幕坐标
         :param image: 截图图像
         :return: None
         """
         with self.ocr_lock:  # 加锁保护OCR调用
             if image:
-                analyze_image(image)
+                analyze_image_bar(image, screen_coordinate)
                 print(f"Processing image for process: {self.process_name}")
 
     def stop(self):

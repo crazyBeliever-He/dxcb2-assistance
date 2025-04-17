@@ -1,7 +1,45 @@
+import random
+
 import win32con
 import win32gui
 import win32ui
 from PIL import Image
+
+
+def advanced_random_generator(lower, upper, *, mode='int', precision=2, count=1):
+    """
+    高级随机数生成器,未指定则生成一个整数。前两个为位置参数，后面三个为关键字参数
+
+    参数:
+        lower: 下限
+        upper: 上限
+        mode: 生成模式 ('int' 或 'float')
+        precision: 浮点数精度（仅mode=float时有效）
+        count: 生成随机数的数量
+
+    返回:
+        当count=1时返回单个随机数，否则返回列表
+    """
+    if lower >= upper:
+        raise ValueError("下限必须小于上限")
+
+    if mode not in ['int', 'float']:
+        raise ValueError("模式必须是int或float")
+
+    if count < 1:
+        raise ValueError("生成数量必须大于0")
+
+    def generate():
+        if mode == 'int':
+            return random.randint(lower, upper)
+        else:
+            num = random.uniform(lower, upper)
+            return round(num, precision)
+
+    if count == 1:
+        return generate()
+    else:
+        return [generate() for _ in range(count)]
 
 def save_image(image, file_path):
     """保存图像"""
@@ -71,7 +109,7 @@ def capture_window(window_title):
     mfc_dc.DeleteDC()
     win32gui.ReleaseDC(hwnd, hwnd_dc)
 
-    return image
+    return image,[left, top, right, bottom]
 
 
 

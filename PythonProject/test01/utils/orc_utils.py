@@ -8,8 +8,24 @@ os.makedirs(model_dir, exist_ok=True)
 
 # 全局OCR实例和锁
 _ocr = None
-_ocr_init_lock = threading.Lock()
+"""
+PaddleOCR 识别结果数据结构说明:
+------------------------------------------------------------
+整体结构:
+  - 返回结果是一个列表，每个元素对应一张输入图片的识别结果
+  - 单图片输入时只需关注 result[0]
 
+文本框数据结构:
+  [
+      [
+          [[x1,y1], [x2,y2], [x3,y3], [x4,y4]],  # 文本框坐标,顺序：左上→右上→右下→左下
+          ("识别文本", 置信度)                      # 文本和置信度
+      ],
+      ...  # 更多文本框
+  ]
+------------------------------------------------------------
+"""
+_ocr_init_lock = threading.Lock()
 def init_ocr():
     """
     初始化OCR实例，使用惰性加载方式
@@ -18,6 +34,7 @@ def init_ocr():
     global _ocr
     with _ocr_init_lock:
         if _ocr is None:
+            print("正在初始化OCR实例...")
             _ocr = PaddleOCR(
                 use_gpu=False,
                 det_model_dir=os.path.join(model_dir, "ch_PP-OCRv4_det_infer"),
