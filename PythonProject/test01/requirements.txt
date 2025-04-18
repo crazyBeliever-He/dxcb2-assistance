@@ -4,3 +4,6 @@ numpy~=2.2.4
 pillow~=11.1.0
 paddleocr~=2.10.0
 matplotlib~=3.10.1
+
+PyAutoGUI~=0.9.54
+scikit-learn~=1.6.1

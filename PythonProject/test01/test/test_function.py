@@ -1,9 +1,17 @@
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.cluster import DBSCAN
+
+"""
+根据检测出的直线的数量确定截取屏幕中格子的数量。
+要避免一条直线被识别为多条直线。
+"""
+
+
 
 # 1. 读取图片
-image_path = "test01.jpg"  # 替换为你的图片路径
+image_path = "test.jpg"  # 替换为你的图片路径
 image = cv2.imread(image_path)  # 替换为你的图片路径
 if image is None:
     raise FileNotFoundError("图片未找到，请检查路径！")
