@@ -1,22 +1,23 @@
 import threading
-from core.process_capture import ProcessCapture
+from core.capture_windows import CaptureWindows
 
 class ThreadManager:
     def __init__(self):
+        # capture_thread 是一个 线程对象（threading.Thread），它的核心作用是 让 ProcessCapture 的任务在后台独立运行，避免阻塞主线程。
         self.capture_thread = None
-        self.process_capture = None
+        self.capture_windows = None
 
     def start_capture(self, process_name):
         if self.capture_thread and self.capture_thread.is_alive():
             return
 
-        self.process_capture = ProcessCapture(process_name)
-        self.capture_thread = threading.Thread(target=self.process_capture.run)
-        self.capture_thread.start()
+        self.capture_windows = CaptureWindows(process_name)
+        self.capture_thread = threading.Thread(target=self.capture_windows.run)
+        self.capture_thread.start() # 任务在子线程中运行，主线程不受阻塞
 
     def stop_capture(self):
-        if self.process_capture:
-            self.process_capture.stop()
+        if self.capture_windows:
+            self.capture_windows.stop()
             if self.capture_thread:
                 self.capture_thread.join(timeout=2.0)
                 if self.capture_thread.is_alive():
@@ -25,4 +26,4 @@ class ThreadManager:
                     from utils.image_utils import release_ocr
                     release_ocr()
                     self.capture_thread = None
-            self.process_capture = None
+            self.capture_windows = None

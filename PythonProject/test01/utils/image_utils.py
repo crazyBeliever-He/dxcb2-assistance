@@ -43,8 +43,8 @@ def advanced_random_generator(lower, upper, *, mode='int', precision=2, count=1)
 
 def save_image(image, file_path):
     """保存图像"""
-    image.save(file_path)
-    print(f"Image saved to {file_path}")
+    image.save("image/"+file_path)
+    print(f"Image saved to image/{file_path}")
 
 def cut_image(image, left, top, right, bottom):
     """

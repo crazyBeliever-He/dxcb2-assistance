@@ -63,9 +63,3 @@ class MainWindow(QMainWindow):
         self.thread_manager.stop_capture()
         self.status_label.setText("Status: Stopped")
 
-    def closeEvent(self, event):  # 新增方法
-        # 停止所有捕获线程
-        self.thread_manager.stop_capture()
-        # 确保完全退出应用程序
-        QCoreApplication.quit()
-        event.accept()
