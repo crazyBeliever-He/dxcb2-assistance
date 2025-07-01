@@ -63,3 +63,32 @@ def release_ocr():
             print(f"释放OCR资源时出错: {e}")
         finally:
             _ocr = None
+
+def find_text_index(ocr_result, target_text):
+    """
+    在OCR结果中查找包含目标文本的条目
+
+    参数:
+        ocr_result: OCR识别结果 (result[0])
+        target_text: 要查找的文本
+
+    返回:
+        如果找到则返回(index, text, bbox)，否则返回(None, None, None)
+        bbox格式: [左上x, 左上y, 右下x, 右下y]
+    """
+    if not ocr_result:
+        return None, None, None
+
+    for idx, item in enumerate(ocr_result):
+        text = item[1][0]  # 获取识别文本
+        if target_text in text:
+            # 提取文本框坐标并转换为(x1,y1,x2,y2)格式
+            bbox = [
+                item[0][0][0],  # 左上x
+                item[0][0][1],  # 左上y
+                item[0][2][0],  # 右下x
+                item[0][2][1]  # 右下y
+            ]
+            return idx, text, bbox
+
+    return None, None, None

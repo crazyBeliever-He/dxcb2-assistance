@@ -1,5 +1,6 @@
 import random
 
+import numpy as np
 import win32con
 import win32gui
 import win32ui
@@ -45,6 +46,27 @@ def save_image(image, file_path):
     """保存图像"""
     image.save("image/"+file_path)
     print(f"Image saved to image/{file_path}")
+
+
+def crop_center_square(image):
+    """
+    以图片中心为中心，裁剪一个边长为原图宽度的正方形区域
+    :param image: 输入图片（BGR或灰度）
+    :return: 裁剪后的正方形图片
+    """
+    height, width = image.shape[:2]
+
+    # 检查高度是否足够裁剪
+    if height < width:
+        raise ValueError("原图高度小于宽度，无法裁剪正方形！")
+
+    # 计算裁剪区域的左上角坐标
+    x = 0  # 因为宽度是基准，x 始终从 0 开始
+    y = (height - width) // 2
+
+    # 执行裁剪
+    cropped_img = image[y:y + width, x:x + width]
+    return cropped_img
 
 def cut_image(image, left, top, right, bottom):
     """
@@ -109,7 +131,11 @@ def capture_window(window_title):
     mfc_dc.DeleteDC()
     win32gui.ReleaseDC(hwnd, hwnd_dc)
 
-    return image,[left, top, right, bottom]
+    # 将PIL Image转为numpy数组（RGB格式）
+    image_np = np.array(image)
+    if image_np.dtype != np.uint8:
+        image_np = image_np.astype(np.uint8)
+    return image_np,[left, top, right, bottom]
 
 
 

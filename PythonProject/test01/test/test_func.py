@@ -69,11 +69,46 @@ def get_crop_bounds(merged_lines):
     x_min, x_max = min(vertical_xs), max(vertical_xs)
     return x_min, x_max, y_min, y_max
 
+
+def crop_center_square(img):
+    """
+    以图片中心为中心，裁剪一个边长为原图宽度的正方形区域
+    :param img: 输入图片（BGR或灰度）
+    :return: 裁剪后的正方形图片
+    """
+    height, width = img.shape[:2]
+
+    # 检查高度是否足够裁剪
+    if height < width:
+        raise ValueError("原图高度小于宽度，无法裁剪正方形！")
+
+    # 计算裁剪区域的左上角坐标
+    x = 0  # 因为宽度是基准，x 始终从 0 开始
+    y = (height - width) // 2
+
+    # 执行裁剪
+    cropped_img = img[y:y + width, x:x + width]
+    return cropped_img
+
+
 # 1. 读取图片
-image_path = "test.jpg"
+image_path = "test01.jpg"
 image = cv2.imread(image_path)
 if image is None:
     raise FileNotFoundError("图片未找到，请检查路径！")
+
+
+
+image = crop_center_square(image)  # 裁剪为正方形
+
+
+
+# 转换到 HSV 并提取 V 通道
+hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+v_channel = hsv[:, :, 2]
+# 阈值分割（V > 220 视为高亮）
+_, bright_mask_hsv = cv2.threshold(v_channel, 220, 255, cv2.THRESH_BINARY)
+
 
 # 2. 预处理
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -84,6 +119,11 @@ edges = cv2.Canny(thresh, 50, 150, apertureSize=3)
 # 3. 检测直线
 lines = cv2.HoughLinesP(edges, 1, np.pi / 180, threshold=100, minLineLength=100, maxLineGap=10)
 print("检测到的直线数量:", len(lines) if lines is not None else 0)
+image_with_raw_lines = image.copy()
+if lines is not None:
+    for line in lines:
+        x1, y1, x2, y2 = line[0]
+        cv2.line(image_with_raw_lines, (x1, y1), (x2, y2), (255, 0, 0), 2)  # 用蓝色绘制原始直线
 
 # 4. 合并直线并获取裁剪边界
 x_min, x_max, y_min, y_max = get_crop_bounds(lines)
@@ -97,10 +137,10 @@ if merged_lines:
     for line in merged_lines:
         x1, y1, x2, y2 = line[0]
         angle = np.arctan2(y2 - y1, x2 - x1) * 180 / np.pi
-        if abs(angle) < 5:  # 水平线
+        if abs(angle) < 1:  # 水平线
             cv2.line(image, (x1, y1), (x2, y2), (0, 0, 255), 2)
             horizontal_lines.append(y1)
-        elif abs(abs(angle) - 90) < 5:  # 垂直线
+        elif abs(abs(angle) - 90) < 1:  # 垂直线
             cv2.line(image, (x1, y1), (x2, y2), (0, 255, 0), 2)
             vertical_lines.append(x1)
 
@@ -110,20 +150,25 @@ cols = len(set(vertical_lines)) - 1 if vertical_lines else 0
 print(f"网格行数: {rows}, 列数: {cols}")
 
 # 7. 显示结果
-plt.figure(figsize=(18, 6))
-plt.subplot(1, 3, 1)
-plt.imshow(cv2.cvtColor(cv2.imread(image_path), cv2.COLOR_BGR2RGB))
+plt.figure(figsize=(24, 6))
+plt.subplot(1, 4, 1)
+plt.imshow(cv2.cvtColor(crop_center_square(cv2.imread(image_path)), cv2.COLOR_BGR2RGB))
 plt.title("Original Image")
 plt.axis('off')
 
-plt.subplot(1, 3, 2)
-plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+plt.subplot(1, 4, 2)
+plt.imshow(cv2.cvtColor(bright_mask_hsv, cv2.COLOR_BGR2RGB))
+plt.title(f"Raw Detected Lines ({len(lines)} lines)")
+plt.axis('off')
+
+plt.subplot(1, 4, 3)
+plt.imshow(cv2.cvtColor(image_with_raw_lines, cv2.COLOR_BGR2RGB))
 plt.title(f"Merged Lines (Grid: {rows}x{cols})")
 plt.axis('off')
 
-plt.subplot(1, 3, 3)
+plt.subplot(1, 4, 4)
 plt.imshow(cv2.cvtColor(cropped_image, cv2.COLOR_BGR2RGB))
-plt.title(f"Cropped Merged Lines (Grid: {rows}x{cols})")
+plt.title(f"Cropped Grid (Grid: {rows}x{cols})")
 plt.axis('off')
 
 plt.tight_layout()

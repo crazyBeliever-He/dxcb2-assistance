@@ -6,21 +6,30 @@ from utils.orc_utils import release_ocr
 from .image_analysis import analyze_image_42botty, analyze_image_bar
 
 class CaptureWindows:
-    def __init__(self, process_name):
+    def __init__(self, process_name, function_id):
         self.process_name = process_name
-        self.is_running = True
+        self.function_id = function_id  # 存储功能ID
+        self.stop_event = threading.Event()  # 线程安全的事件标志
         self.lock = threading.Lock()
         self.ocr_lock = threading.Lock()  # OCR专用锁
 
     def run(self):
         try:
-            while self.is_running:
+            while not self.stop_event.is_set():  # 检查停止标志
                 with self.lock:
-                    # 截图并处理
-                    screenshot,screen_coordinate = capture_window(self.process_name)
-                    if screenshot:
-                        self.process_image(screenshot, screen_coordinate)
-                time.sleep(advanced_random_generator(0.8, 1.8, mode='float'))  # 随机延时，避免过于频繁的截图
+                    with self.ocr_lock:
+                        # 根据 function_id 执行不同操作
+                        if self.function_id == 1:  # 酒馆
+                            analyze_image_bar(self.process_name, stop_event=self.stop_event)
+                            print(f"酒馆招募: {self.process_name}")
+                        elif self.function_id == 2:  # 战利品龙骨
+                            analyze_image_42botty(self.process_name)
+                            print(f"战利品龙骨: {self.process_name}")
+                        elif self.function_id == 3:  # 其他功能
+                            # 执行其他分析，有需要就补全
+                            print(f"执行其他分析: {self.process_name}")
+                        else:
+                            print(f"未知功能ID: {self.function_id}")
         except Exception as e:
             print(f"捕获线程异常: {e}")
         finally:
@@ -29,18 +38,5 @@ class CaptureWindows:
             except Exception as e:
                 print(f"释放资源时出错: {e}")
 
-    def process_image(self, image, screen_coordinate):
-        """
-        处理截图并进行OCR分析.核心功能函数
-        :param screen_coordinate: 程序窗口的屏幕坐标
-        :param image: 截图图像
-        :return: None
-        """
-        with self.ocr_lock:  # 加锁保护OCR调用(with自动释放锁)
-            if image:
-                """TODO: 根据不同的参数调用不同的分析函数"""
-                analyze_image_bar(image, screen_coordinate)
-                print(f"Processing image for process: {self.process_name}")
-
     def stop(self):
-        self.is_running = False
+        self.stop_event.set()  # 触发停止标志

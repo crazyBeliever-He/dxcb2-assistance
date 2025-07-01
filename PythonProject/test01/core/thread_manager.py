@@ -7,11 +7,11 @@ class ThreadManager:
         self.capture_thread = None
         self.capture_windows = None
 
-    def start_capture(self, process_name):
+    def start_capture(self, process_name, function_id):
         if self.capture_thread and self.capture_thread.is_alive():
             return
 
-        self.capture_windows = CaptureWindows(process_name)
+        self.capture_windows = CaptureWindows(process_name, function_id)
         self.capture_thread = threading.Thread(target=self.capture_windows.run)
         self.capture_thread.start() # 任务在子线程中运行，主线程不受阻塞
 
