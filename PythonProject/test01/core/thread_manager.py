@@ -1,5 +1,5 @@
 import threading
-from core.capture_windows import CaptureWindows
+from core.capture_screenshot import CaptureWindows
 
 class ThreadManager:
     def __init__(self):

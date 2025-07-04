@@ -5,7 +5,13 @@ from sklearn.cluster import DBSCAN
 
 
 def merge_lines(lines, angle_thresh=5, dist_thresh=20):
-    """合并相近的直线（水平或垂直）"""
+    """
+    合并相近的直线（水平或垂直）
+    :param lines:
+    :param angle_thresh:
+    :param dist_thresh:
+    :return:
+    """
     if lines is None:
         return []
 
@@ -125,7 +131,7 @@ if lines is not None:
         x1, y1, x2, y2 = line[0]
         cv2.line(image_with_raw_lines, (x1, y1), (x2, y2), (255, 0, 0), 2)  # 用蓝色绘制原始直线
 
-# 4. 合并直线并获取裁剪边界
+# 4. 合并直线并根据直线裁剪图片为最小单位的方格
 x_min, x_max, y_min, y_max = get_crop_bounds(lines)
 merged_lines = merge_lines(lines)
 cropped_image = image[y_min:y_max, x_min:x_max]

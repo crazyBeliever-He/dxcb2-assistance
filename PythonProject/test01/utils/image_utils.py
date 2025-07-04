@@ -50,22 +50,21 @@ def save_image(image, file_path):
 
 def crop_center_square(image):
     """
-    以图片中心为中心，裁剪一个边长为原图宽度的正方形区域
+    以图片中心为中心，以短边为裁剪后边长，裁剪一个正方形区域：
     :param image: 输入图片（BGR或灰度）
     :return: 裁剪后的正方形图片
     """
     height, width = image.shape[:2]
 
-    # 检查高度是否足够裁剪
-    if height < width:
-        raise ValueError("原图高度小于宽度，无法裁剪正方形！")
+    # 确定正方形边长
+    size = min(height, width)  # 取宽高中的较小值
 
     # 计算裁剪区域的左上角坐标
-    x = 0  # 因为宽度是基准，x 始终从 0 开始
-    y = (height - width) // 2
+    x = (width - size) // 2
+    y = (height - size) // 2
 
     # 执行裁剪
-    cropped_img = image[y:y + width, x:x + width]
+    cropped_img = image[y:y + size, x:x + size]
     return cropped_img
 
 def cut_image(image, left, top, right, bottom):

@@ -3,7 +3,7 @@ import time
 
 from utils.image_utils import capture_window, advanced_random_generator
 from utils.orc_utils import release_ocr
-from .image_analysis import analyze_image_42botty, analyze_image_bar
+from .action_logic import analyze_image_42botty, analyze_image_bar
 
 class CaptureWindows:
     def __init__(self, process_name, function_id):
